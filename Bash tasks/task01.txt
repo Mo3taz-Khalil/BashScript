@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+YEAR=$(date +%Y)
+MONTH=$(date +%m)
+DAY=$(date +%d)
+HOUR=$(date +%I)
+PM_OR_AM=$(date +%p)
+####
+if [ -d ~/reports ] ;
+        then
+                echo "Reports directory exist"
+        else
+                mkdir ~/reports
+fi
+#####
+if [ -d ~/backup ] ;
+        then
+                echo "Backup directory exist"
+        else
+                mkdir ~/backup
+fi
+####
+for i in {01..12} ;
+        do
+                if [ -f ~/reports/$YEAR-$i-$DAY.xls ] ;
+                        then echo "$YEAR-$i-$DAY.xls exist"
+                else
+                        touch ~/reports/$YEAR-$i-$DAY.xls
+                        echo "$YEAR-$i-$DAY.xls Created"        
+                fi
+        done
+####
+
+
+if [ $HOUR -gt 12 ] || [ $HOUR -lt 5 ] && [ "$PM_OR_AM" == "AM" ] ;
+then
+        mv  ~/reports/$YEAR-$MONTH-$DAY.xls ~/backups
+        echo "Reports backup done" 
+else
+        echo "Not the right time"
+fi
+

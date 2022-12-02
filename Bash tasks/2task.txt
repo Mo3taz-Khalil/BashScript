@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+
+
+USERIS=$(whoami)
+
+whichUser(){
+if [ USERIS == "root" ] 
+	then echo "user is root"
+	else echo "user is $USERIS." 
+fi
+
+}
+
+whichUser
+########################
+
+changePort(){
+	sed -i 's/^Port 5522/Port 3333/' /etc/ssh/sshd_config
+	echo "Port changed"
+}
+
+changePort
+##################
+
+permitRootLogin(){
+	sed -i 's/^PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+        echo "Root permit to login no"
+}
+
+permitRootLogin
+###################3
+echo "please enter username"
+read USERNAME
+echo "please enter name"
+read NAME
+echo "Sudoer ? (y/n)"
+read SUDOER
+
+addinguser(){
+	useradd -c $2 $1
+	echo "user added"
+}
+
+addinguser $USERNAME  $NAME
+
+
+addingPassword(){
+	passwd $USERNAME
+	echo "Password set successfully"
+}
+
+makeusersudoer(){
+	usermod -aG wheel $USERNAME
+	echo "$USERNAME is now sudeor successfully"
+}
+
+if [ $SUDOER == 'y' ]
+	then 
+	addingPassword
+	makeusersudoer
+else
+	echo "$USERNAME is not a sudoer." 
+fi
+
+
+
+###############
+
+
+
+home_backup ()
+{
+ read -p "Enter the user you want to backup his home dir->" usr
+ echo "SCHEDULING USER HOME DIR. BACKUP"
+ echo "................................"
+ echo "Choose Crontab time if not write -- * --"
+ echo "Minute  Hour  Day.In.Month  Month  Day.In.Week"
+ read -p "Month (must be between 1-12):" month
+ read -p "day in month (must be between 1-31):" dayInmonth
+ read -p "hour (must be between 0-23):" hour
+ read -p "minute (must be between 0-59):" min
+ read -p "day in week (must be between 0-6) 0=sunday:" week_day
+ #command="rsync -av /home/$usr /home/$usr/backup "
+ command="tar -zcvpf /home/$usr/tar_backup /home/$usr/"
+ job="$min $hour $dayInmonth $month $week_day $command"
+ (crontab -l ; echo "$job") | crontab -
+ #cat <(fgrep -i -v "$command" <(crontab -l)) <(echo "$job") | crontab -
+ echo "command:< $job > was added successfully to the crontab"
+}
+
+home_backup
+
+
